@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.content.Intent
 import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.Spinner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -13,15 +14,17 @@ class SourcesActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var spinner: Spinner
+    private lateinit var skipButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sources)
+        skipButton= findViewById(R.id.skipButton)
 
         val intent: Intent = getIntent()
         val searchTerm: String = intent.getStringExtra("SEARCH")!!
 
-        val title = "Search for: ${searchTerm.toString()}"
+        val title = "Search for: {searchTerm}"
         setTitle(title)
 
         val fakeSources: List<Source> = getFakeSources()
@@ -36,6 +39,15 @@ class SourcesActivity : AppCompatActivity() {
             android.R.layout.simple_spinner_item).also {adapter ->
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinner.adapter = adapter
+        }
+
+        //If the skipButton is clicked then move to the results page without filtering results
+        skipButton.setOnClickListener {
+            Log.d("SourcesActivity", "skip button clicked!")
+
+            val intent: Intent = Intent(this, ResultsActivity::class.java)
+            intent.putExtra("RESULT", searchTerm)
+            startActivity(intent)
         }
     }
 
