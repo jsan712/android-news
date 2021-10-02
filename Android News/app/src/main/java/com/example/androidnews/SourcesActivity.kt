@@ -22,6 +22,7 @@ class SourcesActivity : AppCompatActivity() {
         setTitle(title)
 
         val fakeSources: List<Source> = getFakeSources()
+        recyclerView = findViewById(R.id.recyclerView)
         val adapter: SourcesAdapter = SourcesAdapter(fakeSources)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
