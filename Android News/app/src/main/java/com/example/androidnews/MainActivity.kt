@@ -2,6 +2,7 @@ package com.example.androidnews
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
@@ -25,7 +26,7 @@ class MainActivity : AppCompatActivity() {
 
         Log.d("MainActivity", "onCreate called!")
 
-        val preferences = getSharedPreferences("android-news", Context.MODE_PRIVATE)
+        val preferences: SharedPreferences = getSharedPreferences("android-news", Context.MODE_PRIVATE)
 
         searchBox= findViewById(R.id.searchBox)
         searchButton= findViewById(R.id.searchButton)
@@ -33,10 +34,12 @@ class MainActivity : AppCompatActivity() {
         headlinesButton= findViewById(R.id.headlinesButton)
         progressBar = findViewById(R.id.progressBar)
 
-        searchButton.isEnabled = false
-
         val savedSearchTerm = preferences.getString("SEARCH_TERM", "")
         searchBox.setText(savedSearchTerm)
+
+        searchBox.addTextChangedListener(textWatcher)
+
+        searchButton.isEnabled = false
 
         searchButton.setOnClickListener{
             Log.d("MainActivity", "Button clicked!")
@@ -52,7 +55,7 @@ class MainActivity : AppCompatActivity() {
             editor.apply()
         }
 
-        searchBox.addTextChangedListener(textWatcher)
+
 
     }
 

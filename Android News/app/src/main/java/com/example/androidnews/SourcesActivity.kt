@@ -4,12 +4,15 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.content.Intent
+import android.widget.ArrayAdapter
+import android.widget.Spinner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 class SourcesActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
+    private lateinit var spinner: Spinner
 
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
@@ -18,7 +21,7 @@ class SourcesActivity : AppCompatActivity() {
         val intent: Intent = getIntent()
         val searchTerm: String = intent.getStringExtra("SEARCH")!!
 
-        val title = "Search for: {searchTerm}"
+        val title = "Search for: ${searchTerm.toString()}"
         setTitle(title)
 
         val fakeSources: List<Source> = getFakeSources()
@@ -26,6 +29,14 @@ class SourcesActivity : AppCompatActivity() {
         val adapter: SourcesAdapter = SourcesAdapter(fakeSources)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
+
+        //The following block of code was given by https://developer.android.com/guide/topics/ui/controls/spinner
+        spinner = findViewById(R.id.spinner)
+        ArrayAdapter.createFromResource(this, R.array.temp_array,
+            android.R.layout.simple_spinner_item).also {adapter ->
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            spinner.adapter = adapter
+        }
     }
 
     fun getFakeSources(): List<Source>{
