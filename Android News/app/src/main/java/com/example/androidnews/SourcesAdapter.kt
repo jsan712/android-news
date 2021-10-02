@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class SourcesAdapter(val sources: List<Source>) : RecyclerView.Adapter<SourcesAdapter.ViewHolder>() {
+    //How many rows will be rendered
     override fun getItemCount(): Int = sources.size
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {

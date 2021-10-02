@@ -34,35 +34,39 @@ class MainActivity : AppCompatActivity() {
         headlinesButton= findViewById(R.id.headlinesButton)
         progressBar = findViewById(R.id.progressBar)
 
+        //Restore the previous search from SharedPreferences and display it to the user when the screen loads
+        //Default to the empty string if there is no saved search term
         val savedSearchTerm = preferences.getString("SEARCH_TERM", "")
         searchBox.setText(savedSearchTerm)
 
-        searchBox.addTextChangedListener(textWatcher)
-
-        searchButton.isEnabled = false
+        if(searchBox.text.toString().isBlank()){
+            searchButton.isEnabled = false
+        }
 
         searchButton.setOnClickListener{
             Log.d("MainActivity", "Button clicked!")
+
+            //Save the search term to SharedPreferences
+            val inputtedTerm = searchBox.getText().toString()
+            val editor = preferences.edit()
+            editor.putString("SEARCH_TERM", inputtedTerm)
+            editor.apply()
+
+            //Set the progress bar to visible when the user clicks search
             progressBar.visibility = View.VISIBLE
 
             val intent: Intent = Intent(this, SourcesActivity::class.java)
             intent.putExtra("SEARCH", searchBox.toString())
             startActivity(intent)
 
-            val inputtedTerm = searchBox.getText().toString()
-            val editor = preferences.edit()
-            editor.putString("SEARCH_TERM", inputtedTerm)
-            editor.apply()
+
         }
-
-
-
+        searchBox.addTextChangedListener(textWatcher)
     }
 
     private val textWatcher: TextWatcher = object : TextWatcher{
-        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int){
+        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int){}
 
-        }
         override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int){
             Log.d("MainActivity", "Text is ${searchBox.getText().toString()}")
             val inputtedText = searchBox.text.toString()

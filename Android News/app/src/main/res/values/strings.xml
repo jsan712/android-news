@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">AndroidNews</string>
+    <string name="sources_title">Search for: %1$s</string>
+    <string name="results_title">Results for: %1$s</string>
     <string-array name="temp_array">
         <item>News</item>
         <item>Sports</item>

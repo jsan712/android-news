@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class ResultsAdapter(val results: List<Result>) : RecyclerView.Adapter<ResultsAdapter.ViewHolder>() {
+    //How many rows will be rendered
     override fun getItemCount(): Int = results.size
 
     override fun onBindViewHolder(viewHolder: ResultsAdapter.ViewHolder, position: Int) {

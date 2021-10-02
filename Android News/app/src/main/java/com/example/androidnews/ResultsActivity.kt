@@ -16,10 +16,12 @@ class ResultsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_results)
 
+        //Get data from the Intent that launhed this screen
         val intent: Intent = getIntent()
         val result: String = intent.getStringExtra("RESULT")!!
 
-        val title = "Results for: {result}"
+        //Set the title for the screen
+        val title = getString(R.string.sources_title, result)
         setTitle(title)
 
     }
