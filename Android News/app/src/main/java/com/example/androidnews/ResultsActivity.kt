@@ -21,7 +21,7 @@ class ResultsActivity : AppCompatActivity() {
         val result: String = intent.getStringExtra("RESULT")!!
 
         //Set the title for the screen
-        val title = getString(R.string.sources_title, result)
+        val title = getString(R.string.results_title, result)
         setTitle(title)
 
     }

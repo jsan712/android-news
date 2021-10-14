@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity() {
             progressBar.visibility = View.VISIBLE
 
             val intent: Intent = Intent(this, SourcesActivity::class.java)
-            intent.putExtra("SEARCH", searchBox.toString())
+            intent.putExtra("SEARCH", searchBox.text.toString())
             startActivity(intent)
         }
         searchBox.addTextChangedListener(textWatcher)
