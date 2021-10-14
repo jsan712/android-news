@@ -2,12 +2,15 @@
     <string name="app_name">AndroidNews</string>
     <string name="sources_title">Search for: %1$s</string>
     <string name="results_title">Results for: %1$s</string>
-    <string-array name="temp_array">
-        <item>News</item>
-        <item>Sports</item>
-        <item>Health</item>
-        <item>COVID-19</item>
+    <string-array name="categories">
+        <item>Business</item>
         <item>Entertainment</item>
+        <item>General</item>
+        <item>Health</item>
+        <item>Science</item>
+        <item>Sports</item>
         <item>Technology</item>
     </string-array>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string name="geocoder_no_results">No results for location!</string>
 </resources>

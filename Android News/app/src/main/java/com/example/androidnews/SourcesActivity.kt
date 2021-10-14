@@ -21,26 +21,31 @@ class SourcesActivity : AppCompatActivity() {
         setContentView(R.layout.activity_sources)
         skipButton= findViewById(R.id.skipButton)
 
-        //Get data from the Intent that launhed this screen
+        //Get data from the Intent that launched this screen
         val intent: Intent = getIntent()
         val searchTerm: String = intent.getStringExtra("SEARCH")!!
 
         //Set the title for the screen
-        //val title = getString(R.string.sources_title, searchTerm)
-        setTitle("Search for: $searchTerm")
+        val title = getString(R.string.sources_title, searchTerm)
+        setTitle(title)
 
+        //For testing purposes only
         val fakeSources: List<Source> = getFakeSources()
         recyclerView = findViewById(R.id.recyclerView)
-
-        val adapter: SourcesAdapter = SourcesAdapter(fakeSources)
-        recyclerView.adapter = adapter
 
         //Sets the scrolling direction to vertical
         recyclerView.layoutManager = LinearLayoutManager(this)
 
+        val SourcesManager = SourcesManager()
+        val newsApiKey = ""
+
+        val adapter: SourcesAdapter = SourcesAdapter(fakeSources)
+        recyclerView.adapter = adapter
+
+
         //The following block of code was given by https://developer.android.com/guide/topics/ui/controls/spinner
         spinner = findViewById(R.id.spinner)
-        ArrayAdapter.createFromResource(this, R.array.temp_array,
+        ArrayAdapter.createFromResource(this, R.array.categories,
             android.R.layout.simple_spinner_item).also {adapter ->
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinner.adapter = adapter

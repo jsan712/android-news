@@ -58,10 +58,15 @@ class MainActivity : AppCompatActivity() {
             val intent: Intent = Intent(this, SourcesActivity::class.java)
             intent.putExtra("SEARCH", searchBox.toString())
             startActivity(intent)
-
-
         }
         searchBox.addTextChangedListener(textWatcher)
+
+        mapButton.setOnClickListener {
+            Log.d("MainActivity", "Map button clicked!")
+
+            val intent: Intent = Intent(this, MapsActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private val textWatcher: TextWatcher = object : TextWatcher{

@@ -16,7 +16,7 @@ class ResultsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_results)
 
-        //Get data from the Intent that launhed this screen
+        //Get data from the Intent that launched this screen
         val intent: Intent = getIntent()
         val result: String = intent.getStringExtra("RESULT")!!
 
