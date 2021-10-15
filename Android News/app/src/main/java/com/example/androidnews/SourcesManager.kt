@@ -25,18 +25,21 @@ class SourcesManager {
         okHttpClient = okHttpClientBuilder.build()
     }
 
-    fun retrieveSources(): List<Source>{
+    fun retrieveSources(apiKey: String): List<Source>{
         val sources: MutableList<Source> = mutableListOf()
+        val category: String = "Hockey"
 
         val request: Request = Request.Builder()
-            .url("https://newsapi.org/v2/top-headlines/sources?apiKey=e705e59a0fec4faabacae3c2a6ca236a").get().build()
+            .url("https://newsapi.org/v2/top-headlines/sources?category=sports&apiKey=$apiKey")
+            .get()
+            .build()
 
         val response: Response = okHttpClient.newCall(request).execute()
         val responseBody: String? = response.body?.string()
 
         if(response.isSuccessful && !responseBody.isNullOrBlank()){
             val json: JSONObject = JSONObject(responseBody)
-            val statuses: JSONArray = json.getJSONArray("statuses")
+            val statuses: JSONArray = json.getJSONArray("sources")
 
             for(i in 0 until statuses.length()){
                 val curr: JSONObject = statuses.getJSONObject(i)

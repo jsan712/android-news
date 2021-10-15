@@ -7,8 +7,10 @@ import android.content.Intent
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Spinner
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import org.jetbrains.anko.doAsync
 
 class SourcesActivity : AppCompatActivity() {
 
@@ -36,12 +38,31 @@ class SourcesActivity : AppCompatActivity() {
         //Sets the scrolling direction to vertical
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        val SourcesManager = SourcesManager()
-        val newsApiKey = ""
+        val sourcesManager = SourcesManager()
+        val newsApiKey = getString(R.string.news_api_key)
 
-        val adapter: SourcesAdapter = SourcesAdapter(fakeSources)
-        recyclerView.adapter = adapter
+        doAsync {
+            val sources: List<Source> = try{
+                sourcesManager.retrieveSources(newsApiKey)
+            }catch(exception: Exception){
+                Log.e("SourcesActivity", "Retrieving Sources failed!", exception)
+                listOf<Source>()
+            }
 
+            runOnUiThread {
+                if(sources.isNotEmpty()){
+                    val adapter: SourcesAdapter = SourcesAdapter(sources)
+                    recyclerView.adapter = adapter
+                }
+                else{
+                    Toast.makeText(
+                        this@SourcesActivity,
+                        "Failed to retrieve sources!",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
 
         //The following block of code was given by https://developer.android.com/guide/topics/ui/controls/spinner
         spinner = findViewById(R.id.spinner)

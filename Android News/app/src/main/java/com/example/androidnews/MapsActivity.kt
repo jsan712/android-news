@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -21,6 +23,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
+    private lateinit var recyclerView: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,6 +77,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
                         // Add a map marker where the user tapped and pan the camera over
                         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(coords, 10.0f))
+
+                        //Show sources based on the location
+                        recyclerView = findViewById(R.id.recyclerView)
+
+                        //recyclerView.layoutManager = LinearLayoutManager(this)
 
                     } else {
                         Log.d("MapsActivity", "No results from geocoder!")

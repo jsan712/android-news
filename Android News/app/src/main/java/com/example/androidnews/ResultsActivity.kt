@@ -20,7 +20,7 @@ class ResultsActivity : AppCompatActivity() {
         val intent: Intent = getIntent()
         val result: String = intent.getStringExtra("RESULT")!!
 
-        //Set the title for the screen
+        //Set the title for the screen when coming from the skip sources button
         val title = getString(R.string.results_title, result)
         setTitle(title)
 

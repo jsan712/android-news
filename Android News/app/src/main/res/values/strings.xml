@@ -13,4 +13,5 @@
     </string-array>
     <string name="title_activity_maps">MapsActivity</string>
     <string name="geocoder_no_results">No results for location!</string>
+    <string name="results_for_location">Results for: %1$s</string>
 </resources>
