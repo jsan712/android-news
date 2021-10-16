@@ -12,7 +12,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.net.URLEncoder
 
-class SourcesManager {
+class ResultsManager {
     val okHttpClient: OkHttpClient
 
     init{
@@ -25,12 +25,12 @@ class SourcesManager {
         okHttpClient = okHttpClientBuilder.build()
     }
 
-    fun retrieveSources(apiKey: String): List<Source>{
-        val sources: MutableList<Source> = mutableListOf()
-        //val category: String =
+    fun retrieveResults(apiKey: String): List<Result>{
+        val results: MutableList<Result> = mutableListOf()
+        //val searchTerm: String =
 
         val request: Request = Request.Builder()
-            .url("https://newsapi.org/v2/top-headlines/sources?category=sports&apiKey=$apiKey")
+            .url("https://newsapi.org/v2/everything?qInTitle=+'Washington+D.C.'&apiKey=$apiKey")
             .get()
             .build()
 
@@ -39,21 +39,28 @@ class SourcesManager {
 
         if(response.isSuccessful && !responseBody.isNullOrBlank()){
             val json: JSONObject = JSONObject(responseBody)
-            val statuses: JSONArray = json.getJSONArray("sources")
+            val articles: JSONArray = json.getJSONArray("articles")
 
-            for(i in 0 until statuses.length()){
-                val curr: JSONObject = statuses.getJSONObject(i)
-                val name: String = curr.getString("name")
-                val bio: String = curr.getString("description")
+            for(i in 0 until articles.length()){
+                val curr: JSONObject = articles.getJSONObject(i)
 
-                val source: Source = Source(
-                    name = name,
-                    bio = bio
+                val title: String = curr.getString("title")
+                val preview: String = curr.getString("description")
+                val pictureUrl: String = curr.getString("urlToImage")
+
+                val source: JSONObject = curr.getJSONObject("source")
+                val name: String = source.getString("name")
+
+                val result: Result = Result(
+                    headline = title,
+                    preview = preview,
+                    sourceName = name,
+                    pictureURL = pictureUrl
                 )
 
-                sources.add(source)
+                results.add(result)
             }
         }
-        return sources
+        return results
     }
 }

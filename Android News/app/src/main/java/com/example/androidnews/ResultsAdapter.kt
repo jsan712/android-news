@@ -12,17 +12,19 @@ class ResultsAdapter(val results: List<Result>) : RecyclerView.Adapter<ResultsAd
     //How many rows will be rendered
     override fun getItemCount(): Int = results.size
 
-    override fun onBindViewHolder(viewHolder: ResultsAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         val currResult = results[position]
         viewHolder.headline.setText(currResult.headline)
         viewHolder.preview.setText(currResult.preview)
         viewHolder.sourceName.setText(currResult.sourceName)
+
+
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ResultsAdapter.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
-        val rootLayout: View = layoutInflater.inflate(R.layout.row_source, parent, false)
-        return ResultsAdapter.ViewHolder(rootLayout)
+        val rootLayout: View = layoutInflater.inflate(R.layout.row_results, parent, false)
+        return ViewHolder(rootLayout)
     }
 
     class ViewHolder(rootLayout: View) : RecyclerView.ViewHolder(rootLayout){

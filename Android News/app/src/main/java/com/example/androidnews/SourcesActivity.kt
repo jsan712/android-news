@@ -4,15 +4,13 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.content.Intent
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.Spinner
-import android.widget.Toast
+import android.view.View
+import android.widget.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import org.jetbrains.anko.doAsync
 
-class SourcesActivity : AppCompatActivity() {
+class SourcesActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var spinner: Spinner
@@ -31,8 +29,9 @@ class SourcesActivity : AppCompatActivity() {
         val title = getString(R.string.sources_title, searchTerm)
         setTitle(title)
 
-        //For testing purposes only
-        val fakeSources: List<Source> = getFakeSources()
+        //For non-network testing purposes only
+        //val fakeSources: List<Source> = getFakeSources()
+
         recyclerView = findViewById(R.id.recyclerView)
 
         //Sets the scrolling direction to vertical
@@ -66,6 +65,8 @@ class SourcesActivity : AppCompatActivity() {
 
         //The following block of code was given by https://developer.android.com/guide/topics/ui/controls/spinner
         spinner = findViewById(R.id.spinner)
+        spinner.onItemSelectedListener = this
+
         ArrayAdapter.createFromResource(this, R.array.categories,
             android.R.layout.simple_spinner_item).also {adapter ->
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -82,7 +83,17 @@ class SourcesActivity : AppCompatActivity() {
         }
     }
 
-    fun getFakeSources(): List<Source>{
+    override fun onItemSelected(parent: AdapterView<*>, view: View?, pos: Int, id:Long){
+        //An item was selected
+        parent.getItemAtPosition(pos)
+    }
+
+    override fun onNothingSelected(parent: AdapterView<*>){
+        return
+    }
+
+    //For non network testing purposes only
+    /*fun getFakeSources(): List<Source>{
         return listOf(
             Source(
                 name = "CNN",
@@ -125,5 +136,5 @@ class SourcesActivity : AppCompatActivity() {
                 bio = "Breaking news, sport, TV, radio and a whole lot more. The BBC informs, educates and entertains - wherever you are, whatever your age."
             ),
         )
-    }
+    }*/
 }

@@ -6,7 +6,10 @@ import android.location.Geocoder
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.TextView
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
@@ -24,24 +27,26 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
     private lateinit var recyclerView: RecyclerView
+    private lateinit var locationResults: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        locationResults = findViewById(R.id.locationResults)
+
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
     }
 
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
      * If Google Play services is not installed on the device, the user will be prompted to install
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
@@ -78,11 +83,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         // Add a map marker where the user tapped and pan the camera over
                         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(coords, 10.0f))
 
-                        //Show sources based on the location
-                        recyclerView = findViewById(R.id.recyclerView)
-
-                        //recyclerView.layoutManager = LinearLayoutManager(this)
-
                     } else {
                         Log.d("MapsActivity", "No results from geocoder!")
 
@@ -92,6 +92,39 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                             Toast.LENGTH_LONG
                         )
                         toast.show()
+                    }
+                }
+            }
+            //Show results for location text
+            locationResults.visibility = View.VISIBLE
+
+            //Show sources based on the location
+            recyclerView = findViewById(R.id.recyclerView)
+
+            recyclerView.layoutManager = LinearLayoutManager(this)
+
+            val resultsManager = ResultsManager()
+            val newsApiKey = getString(R.string.news_api_key)
+
+            doAsync {
+                val results: List<Result> = try{
+                    resultsManager.retrieveResults(newsApiKey)
+                }catch(exception: Exception){
+                    Log.e("ResultsActivity", "Retrieving results failed!", exception)
+                    listOf<Result>()
+                }
+
+                runOnUiThread {
+                    if(results.isNotEmpty()){
+                        val adapter: ResultsAdapter = ResultsAdapter(results)
+                        recyclerView.adapter = adapter
+                    }
+                    else{
+                        Toast.makeText(
+                            this@MapsActivity,
+                            "Failed to retrieve results!",
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
                 }
             }
