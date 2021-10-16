@@ -11,6 +11,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.OrientationHelper
 import androidx.recyclerview.widget.RecyclerView
 
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -101,7 +102,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             //Show sources based on the location
             recyclerView = findViewById(R.id.recyclerView)
 
-            recyclerView.layoutManager = LinearLayoutManager(this)
+            //Code to make recyclerView horizontal came from https://www.youtube.com/watch?v=EFZkktBOFF8
+            //which proved to be faulty and AndroidStudio suggested a fix that worked
+            recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
 
             val resultsManager = ResultsManager()
             val newsApiKey = getString(R.string.news_api_key)

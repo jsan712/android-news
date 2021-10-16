@@ -27,7 +27,7 @@ class ResultsManager {
 
     fun retrieveResults(apiKey: String): List<Result>{
         val results: MutableList<Result> = mutableListOf()
-        //val searchTerm: String =
+        //val searchLocation: String =
 
         val request: Request = Request.Builder()
             .url("https://newsapi.org/v2/everything?qInTitle=+'Washington+D.C.'&apiKey=$apiKey")
