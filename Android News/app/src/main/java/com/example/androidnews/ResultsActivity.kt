@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.content.Intent
+import android.location.Address
 import android.os.PersistableBundle
 import android.widget.ArrayAdapter
 import android.widget.Toast
@@ -21,6 +22,7 @@ class ResultsActivity : AppCompatActivity() {
         //Get data from the Intent that launched this screen
         val intent: Intent = getIntent()
         val result: String = intent.getStringExtra("RESULT")!!
+        val address: Address = intent.getParcelableExtra("address")!!
 
         //Set the title for the screen when coming from the skip sources button
         val title = getString(R.string.results_title, result)
@@ -31,7 +33,7 @@ class ResultsActivity : AppCompatActivity() {
 
         doAsync {
             val results: List<Result> = try{
-                resultsManager.retrieveResults(newsApiKey)
+                resultsManager.retrieveResults(address.toString(), newsApiKey)
             }catch(exception: Exception){
                 Log.e("ResultsActivity", "Retrieving results failed!", exception)
                 listOf<Result>()

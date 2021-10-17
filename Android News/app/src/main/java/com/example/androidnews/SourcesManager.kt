@@ -25,12 +25,11 @@ class SourcesManager {
         okHttpClient = okHttpClientBuilder.build()
     }
 
-    fun retrieveSources(apiKey: String): List<Source>{
+    fun retrieveSources(searchTerm: String, apiKey: String): List<Source>{
         val sources: MutableList<Source> = mutableListOf()
-        //val category: String =
 
         val request: Request = Request.Builder()
-            .url("https://newsapi.org/v2/top-headlines/sources?category=sports&apiKey=$apiKey")
+            .url("https://newsapi.org/v2/top-headlines/sources?q=$searchTerm&apiKey=$apiKey")
             .get()
             .build()
 

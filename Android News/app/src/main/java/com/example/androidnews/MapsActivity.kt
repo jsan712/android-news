@@ -3,8 +3,10 @@ package com.example.androidnews
 import android.content.Intent
 import android.location.Address
 import android.location.Geocoder
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.Browser
 import android.util.Log
 import android.view.View
 import android.widget.TextView
@@ -29,6 +31,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityMapsBinding
     private lateinit var recyclerView: RecyclerView
     private lateinit var locationResults: TextView
+    private var currentAddress: Address? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +46,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
+    }
+
+    fun updateCurrentAddress(address: Address) {
+        currentAddress = address
+        locationResults.text = address.getAddressLine(0)
     }
 
     /**
@@ -84,6 +92,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         // Add a map marker where the user tapped and pan the camera over
                         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(coords, 10.0f))
 
+                        updateCurrentAddress(firstResult)
+
                     } else {
                         Log.d("MapsActivity", "No results from geocoder!")
 
@@ -96,14 +106,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     }
                 }
             }
+
             //Show results for location text
             locationResults.visibility = View.VISIBLE
+            locationResults.text = getString(R.string.results_for_location, currentAddress.toString())
 
             //Show sources based on the location
             recyclerView = findViewById(R.id.recyclerView)
 
-            //Code to make recyclerView horizontal came from https://www.youtube.com/watch?v=EFZkktBOFF8
-            //which proved to be faulty and AndroidStudio suggested a fix that worked
+            /* Code to make recyclerView horizontal came from https://www.youtube.com/watch?v=EFZkktBOFF8
+             * which proved to be faulty and AndroidStudio suggested a fix that worked
+             */
             recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
 
             val resultsManager = ResultsManager()
@@ -111,7 +124,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
             doAsync {
                 val results: List<Result> = try{
-                    resultsManager.retrieveResults(newsApiKey)
+                    resultsManager.retrieveResults("Washington D.C.", newsApiKey)
                 }catch(exception: Exception){
                     Log.e("ResultsActivity", "Retrieving results failed!", exception)
                     listOf<Result>()
@@ -133,4 +146,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
     }
+
+    /*override fun onItemClick(position: Int) {
+        val openUrl: Intent = Intent(this, Browser)
+        startActivity(openUrl)
+    }*/
 }

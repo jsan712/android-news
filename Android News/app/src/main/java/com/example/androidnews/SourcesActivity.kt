@@ -37,12 +37,26 @@ class SourcesActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener 
         //Sets the scrolling direction to vertical
         recyclerView.layoutManager = LinearLayoutManager(this)
 
+        //The following block of code was given by https://developer.android.com/guide/topics/ui/controls/spinner
+        spinner = findViewById(R.id.spinner)
+
+        ArrayAdapter.createFromResource(this, R.array.categories,
+            android.R.layout.simple_spinner_item).also {adapter ->
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            spinner.adapter = adapter
+        }
+
+        spinner.onItemSelectedListener = this
+
         val sourcesManager = SourcesManager()
         val newsApiKey = getString(R.string.news_api_key)
 
+        //println("Category = $category")
+        //val category = "Washington D.C."
+
         doAsync {
             val sources: List<Source> = try{
-                sourcesManager.retrieveSources(newsApiKey)
+                sourcesManager.retrieveSources(searchTerm, newsApiKey)
             }catch(exception: Exception){
                 Log.e("SourcesActivity", "Retrieving Sources failed!", exception)
                 listOf<Source>()
@@ -63,16 +77,6 @@ class SourcesActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener 
             }
         }
 
-        //The following block of code was given by https://developer.android.com/guide/topics/ui/controls/spinner
-        spinner = findViewById(R.id.spinner)
-        spinner.onItemSelectedListener = this
-
-        ArrayAdapter.createFromResource(this, R.array.categories,
-            android.R.layout.simple_spinner_item).also {adapter ->
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            spinner.adapter = adapter
-        }
-
         //If the skipButton is clicked then move to the results page without filtering results
         skipButton.setOnClickListener {
             Log.d("SourcesActivity", "skip button clicked!")
@@ -83,12 +87,14 @@ class SourcesActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener 
         }
     }
 
+    //The following functions provided by https://developer.android.com/guide/topics/ui/controls/spinner
     override fun onItemSelected(parent: AdapterView<*>, view: View?, pos: Int, id:Long){
-        //An item was selected
-        parent.getItemAtPosition(pos)
+        val selection: String = parent.getItemAtPosition(pos).toString()
+        //category = selection
+        Log.i("SourcesActivity", "New spinner item selected!")
     }
 
-    override fun onNothingSelected(parent: AdapterView<*>){
+    override fun onNothingSelected(parent: AdapterView<*>?) {
         return
     }
 

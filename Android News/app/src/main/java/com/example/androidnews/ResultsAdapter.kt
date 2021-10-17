@@ -27,10 +27,25 @@ class ResultsAdapter(val results: List<Result>) : RecyclerView.Adapter<ResultsAd
         return ViewHolder(rootLayout)
     }
 
-    class ViewHolder(rootLayout: View) : RecyclerView.ViewHolder(rootLayout){
-        val headline: TextView = rootLayout.findViewById(R.id.headline)
-        val preview: TextView = rootLayout.findViewById(R.id.preview)
-        val sourceName: TextView = rootLayout.findViewById(R.id.sourceName)
-        val picture: ImageView = rootLayout.findViewById(R.id.picture)
+    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
+        val headline: TextView = itemView.findViewById(R.id.headline)
+        val preview: TextView = itemView.findViewById(R.id.preview)
+        val sourceName: TextView = itemView.findViewById(R.id.sourceName)
+        val picture: ImageView = itemView.findViewById(R.id.picture)
+
+//        init{
+//            itemView.setOnClickListener(this)
+//        }
+
+//        override fun onClick(view: View?) {
+//            val position: Int = adapterPosition
+//            if(position != RecyclerView.NO_POSITION){
+//                listener.onItemClick(position)
+//            }
+//        }
     }
+
+//    interface OnItemClickListener{
+//        fun onItemClick(position: Int)
+//    }
 }

@@ -25,12 +25,37 @@ class ResultsManager {
         okHttpClient = okHttpClientBuilder.build()
     }
 
-    fun retrieveResults(apiKey: String): List<Result>{
-        val results: MutableList<Result> = mutableListOf()
+    /*fun retrieveUrl(apiKey: String): String{
+        val urls: MutableList<String> = mutableListOf()
         //val searchLocation: String =
+
 
         val request: Request = Request.Builder()
             .url("https://newsapi.org/v2/everything?qInTitle=+'Washington+D.C.'&apiKey=$apiKey")
+            .get()
+            .build()
+
+        val response: Response = okHttpClient.newCall(request).execute()
+        val responseBody: String? = response.body?.string()
+
+        if(response.isSuccessful && !responseBody.isNullOrBlank()) {
+            val json: JSONObject = JSONObject(responseBody)
+            val articles: JSONArray = json.getJSONArray("articles")
+
+            for (i in 0 until articles.length()) {
+                val curr: JSONObject = articles.getJSONObject(i)
+                val url: String = curr.getString("url")
+                urls.add(url)
+            }
+        }
+        return urls[0]
+    }*/
+
+    fun retrieveResults(location: String, apiKey: String): List<Result>{
+        val results: MutableList<Result> = mutableListOf()
+
+        val request: Request = Request.Builder()
+            .url("https://newsapi.org/v2/everything?qInTitle='$location'&apiKey=$apiKey")
             .get()
             .build()
 
