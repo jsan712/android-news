@@ -12,23 +12,40 @@ class ResultsAdapter(val results: List<Result>) : RecyclerView.Adapter<ResultsAd
     //How many rows will be rendered
     override fun getItemCount(): Int = results.size
 
-    override fun onBindViewHolder(viewHolder: ResultsAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         val currResult = results[position]
         viewHolder.headline.setText(currResult.headline)
         viewHolder.preview.setText(currResult.preview)
         viewHolder.sourceName.setText(currResult.sourceName)
+
+
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ResultsAdapter.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
-        val rootLayout: View = layoutInflater.inflate(R.layout.row_source, parent, false)
-        return ResultsAdapter.ViewHolder(rootLayout)
+        val rootLayout: View = layoutInflater.inflate(R.layout.row_results, parent, false)
+        return ViewHolder(rootLayout)
     }
 
-    class ViewHolder(rootLayout: View) : RecyclerView.ViewHolder(rootLayout){
-        val headline: TextView = rootLayout.findViewById(R.id.headline)
-        val preview: TextView = rootLayout.findViewById(R.id.preview)
-        val sourceName: TextView = rootLayout.findViewById(R.id.sourceName)
-        val picture: ImageView = rootLayout.findViewById(R.id.picture)
+    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
+        val headline: TextView = itemView.findViewById(R.id.headline)
+        val preview: TextView = itemView.findViewById(R.id.preview)
+        val sourceName: TextView = itemView.findViewById(R.id.sourceName)
+        val picture: ImageView = itemView.findViewById(R.id.picture)
+
+//        init{
+//            itemView.setOnClickListener(this)
+//        }
+
+//        override fun onClick(view: View?) {
+//            val position: Int = adapterPosition
+//            if(position != RecyclerView.NO_POSITION){
+//                listener.onItemClick(position)
+//            }
+//        }
     }
+
+//    interface OnItemClickListener{
+//        fun onItemClick(position: Int)
+//    }
 }

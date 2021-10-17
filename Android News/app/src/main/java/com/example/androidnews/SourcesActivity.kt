@@ -4,13 +4,13 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.content.Intent
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.Spinner
+import android.view.View
+import android.widget.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import org.jetbrains.anko.doAsync
 
-class SourcesActivity : AppCompatActivity() {
+class SourcesActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var spinner: Spinner
@@ -21,29 +21,60 @@ class SourcesActivity : AppCompatActivity() {
         setContentView(R.layout.activity_sources)
         skipButton= findViewById(R.id.skipButton)
 
-        //Get data from the Intent that launhed this screen
+        //Get data from the Intent that launched this screen
         val intent: Intent = getIntent()
         val searchTerm: String = intent.getStringExtra("SEARCH")!!
 
         //Set the title for the screen
-        //val title = getString(R.string.sources_title, searchTerm)
-        setTitle("Search for: $searchTerm")
+        val title = getString(R.string.sources_title, searchTerm)
+        setTitle(title)
 
-        val fakeSources: List<Source> = getFakeSources()
+        //For non-network testing purposes only
+        //val fakeSources: List<Source> = getFakeSources()
+
         recyclerView = findViewById(R.id.recyclerView)
-
-        val adapter: SourcesAdapter = SourcesAdapter(fakeSources)
-        recyclerView.adapter = adapter
 
         //Sets the scrolling direction to vertical
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         //The following block of code was given by https://developer.android.com/guide/topics/ui/controls/spinner
         spinner = findViewById(R.id.spinner)
-        ArrayAdapter.createFromResource(this, R.array.temp_array,
+
+        ArrayAdapter.createFromResource(this, R.array.categories,
             android.R.layout.simple_spinner_item).also {adapter ->
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinner.adapter = adapter
+        }
+
+        spinner.onItemSelectedListener = this
+
+        val sourcesManager = SourcesManager()
+        val newsApiKey = getString(R.string.news_api_key)
+
+        //println("Category = $category")
+        //val category = "Washington D.C."
+
+        doAsync {
+            val sources: List<Source> = try{
+                sourcesManager.retrieveSources(searchTerm, newsApiKey)
+            }catch(exception: Exception){
+                Log.e("SourcesActivity", "Retrieving Sources failed!", exception)
+                listOf<Source>()
+            }
+
+            runOnUiThread {
+                if(sources.isNotEmpty()){
+                    val adapter: SourcesAdapter = SourcesAdapter(sources)
+                    recyclerView.adapter = adapter
+                }
+                else{
+                    Toast.makeText(
+                        this@SourcesActivity,
+                        "Failed to retrieve sources!",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
         }
 
         //If the skipButton is clicked then move to the results page without filtering results
@@ -56,7 +87,19 @@ class SourcesActivity : AppCompatActivity() {
         }
     }
 
-    fun getFakeSources(): List<Source>{
+    //The following functions provided by https://developer.android.com/guide/topics/ui/controls/spinner
+    override fun onItemSelected(parent: AdapterView<*>, view: View?, pos: Int, id:Long){
+        val selection: String = parent.getItemAtPosition(pos).toString()
+        //category = selection
+        Log.i("SourcesActivity", "New spinner item selected!")
+    }
+
+    override fun onNothingSelected(parent: AdapterView<*>?) {
+        return
+    }
+
+    //For non network testing purposes only
+    /*fun getFakeSources(): List<Source>{
         return listOf(
             Source(
                 name = "CNN",
@@ -99,5 +142,5 @@ class SourcesActivity : AppCompatActivity() {
                 bio = "Breaking news, sport, TV, radio and a whole lot more. The BBC informs, educates and entertains - wherever you are, whatever your age."
             ),
         )
-    }
+    }*/
 }
