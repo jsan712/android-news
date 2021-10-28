@@ -48,15 +48,24 @@ class SourcesActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener 
 
         spinner.onItemSelectedListener = this
 
+
+        //If the skipButton is clicked then move to the results page without filtering results
+        skipButton.setOnClickListener {
+            Log.d("SourcesActivity", "skip button clicked!")
+
+            val intent: Intent = Intent(this, ResultsActivity::class.java)
+            intent.putExtra("RESULT", searchTerm)
+            startActivity(intent)
+        }
+    }
+
+    private fun getSources(category: String){
         val sourcesManager = SourcesManager()
         val newsApiKey = getString(R.string.news_api_key)
 
-        //println("Category = $category")
-        //val category = "Washington D.C."
-
         doAsync {
             val sources: List<Source> = try{
-                sourcesManager.retrieveSources(searchTerm, newsApiKey)
+                sourcesManager.retrieveSources(category, newsApiKey)
             }catch(exception: Exception){
                 Log.e("SourcesActivity", "Retrieving Sources failed!", exception)
                 listOf<Source>()
@@ -76,21 +85,12 @@ class SourcesActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener 
                 }
             }
         }
-
-        //If the skipButton is clicked then move to the results page without filtering results
-        skipButton.setOnClickListener {
-            Log.d("SourcesActivity", "skip button clicked!")
-
-            val intent: Intent = Intent(this, ResultsActivity::class.java)
-            intent.putExtra("RESULT", searchTerm)
-            startActivity(intent)
-        }
     }
 
     //The following functions provided by https://developer.android.com/guide/topics/ui/controls/spinner
     override fun onItemSelected(parent: AdapterView<*>, view: View?, pos: Int, id:Long){
-        val selection: String = parent.getItemAtPosition(pos).toString()
-        //category = selection
+        val category = parent.getItemAtPosition(pos).toString()
+        getSources(category)
         Log.i("SourcesActivity", "New spinner item selected!")
     }
 
