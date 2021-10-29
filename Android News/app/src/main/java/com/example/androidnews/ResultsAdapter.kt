@@ -7,6 +7,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.squareup.picasso.Picasso
 
 class ResultsAdapter(val results: List<Result>) : RecyclerView.Adapter<ResultsAdapter.ViewHolder>() {
     //How many rows will be rendered
@@ -18,7 +19,14 @@ class ResultsAdapter(val results: List<Result>) : RecyclerView.Adapter<ResultsAd
         viewHolder.preview.setText(currResult.preview)
         viewHolder.sourceName.setText(currResult.sourceName)
 
+        if (currResult.pictureURL.isNotBlank()) {
+            Picasso.get().setIndicatorsEnabled(true)
 
+            Picasso
+                .get()
+                .load(currResult.pictureURL)
+                .into(viewHolder.picture)
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

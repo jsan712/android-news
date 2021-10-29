@@ -124,7 +124,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
             doAsync {
                 val results: List<Result> = try{
-                    resultsManager.retrieveResults("Washington D.C.", newsApiKey)
+                    resultsManager.retrieveMapResults("Washington D.C.", newsApiKey)
                 }catch(exception: Exception){
                     Log.e("ResultsActivity", "Retrieving results failed!", exception)
                     listOf<Result>()

@@ -51,11 +51,49 @@ class ResultsManager {
         return urls[0]
     }*/
 
-    fun retrieveResults(location: String, apiKey: String): List<Result>{
+    fun retrieveMapResults(location: String, apiKey: String): List<Result>{
         val results: MutableList<Result> = mutableListOf()
 
         val request: Request = Request.Builder()
             .url("https://newsapi.org/v2/everything?qInTitle=$location&apiKey=$apiKey")
+            .get()
+            .build()
+
+        val response: Response = okHttpClient.newCall(request).execute()
+        val responseBody: String? = response.body?.string()
+
+        if(response.isSuccessful && !responseBody.isNullOrBlank()){
+            val json: JSONObject = JSONObject(responseBody)
+            val articles: JSONArray = json.getJSONArray("articles")
+
+            for(i in 0 until articles.length()){
+                val curr: JSONObject = articles.getJSONObject(i)
+
+                val title: String = curr.getString("title")
+                val preview: String = curr.getString("description")
+                val pictureUrl: String = curr.getString("urlToImage")
+
+                val source: JSONObject = curr.getJSONObject("source")
+                val name: String = source.getString("name")
+
+                val result: Result = Result(
+                    headline = title,
+                    preview = preview,
+                    sourceName = name,
+                    pictureURL = pictureUrl
+                )
+
+                results.add(result)
+            }
+        }
+        return results
+    }
+
+    fun retrieveHeadlineResults(category: String, apiKey: String): List<Result>{
+        val results: MutableList<Result> = mutableListOf()
+
+        val request: Request = Request.Builder()
+            .url("https://newsapi.org/v2/top-headlines?country=us&category=$category&apiKey=$apiKey")
             .get()
             .build()
 

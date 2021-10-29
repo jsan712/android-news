@@ -23,8 +23,6 @@ class TopHeadlinesActivity: AppCompatActivity(), AdapterView.OnItemSelectedListe
         prevButton = findViewById(R.id.prev_button)
         nextButton = findViewById(R.id.nextButton)
 
-        val intent: Intent = getIntent()
-
         recyclerView = findViewById(R.id.headline_recyclerView)
 
         //Sets the scrolling direction to vertical
@@ -42,27 +40,27 @@ class TopHeadlinesActivity: AppCompatActivity(), AdapterView.OnItemSelectedListe
         spinner.onItemSelectedListener = this
     }
 
-    private fun getSources(category: String){
-        val sourcesManager = SourcesManager()
+    private fun getHeadlines(category: String){
+        val resultsManager = ResultsManager()
         val newsApiKey = getString(R.string.news_api_key)
 
         doAsync {
-            val sources: List<Source> = try{
-                sourcesManager.retrieveSources(category, newsApiKey)
+            val results: List<Result> = try{
+                resultsManager.retrieveHeadlineResults(category, newsApiKey)
             }catch(exception: Exception){
-                Log.e("SourcesActivity", "Retrieving Sources failed!", exception)
-                listOf<Source>()
+                Log.e("ResultsActivity", "Retrieving results failed!", exception)
+                listOf<Result>()
             }
 
             runOnUiThread {
-                if(sources.isNotEmpty()){
-                    val adapter: SourcesAdapter = SourcesAdapter(sources)
+                if(results.isNotEmpty()){
+                    val adapter: ResultsAdapter = ResultsAdapter(results)
                     recyclerView.adapter = adapter
                 }
                 else{
                     Toast.makeText(
                         this@TopHeadlinesActivity,
-                        "Failed to retrieve sources!",
+                        "Failed to retrieve results!",
                         Toast.LENGTH_LONG
                     ).show()
                 }
@@ -73,8 +71,8 @@ class TopHeadlinesActivity: AppCompatActivity(), AdapterView.OnItemSelectedListe
     //The following functions provided by https://developer.android.com/guide/topics/ui/controls/spinner
     override fun onItemSelected(parent: AdapterView<*>, view: View?, pos: Int, id:Long){
         val category = parent.getItemAtPosition(pos).toString()
-        getSources(category)
-        Log.i("SourcesActivity", "New spinner item selected!")
+        getHeadlines(category)
+        Log.i("TopHeadlinesActivity", "New spinner item selected!")
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {

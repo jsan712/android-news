@@ -33,7 +33,7 @@ class ResultsActivity : AppCompatActivity() {
 
         doAsync {
             val results: List<Result> = try{
-                resultsManager.retrieveResults(address.toString(), newsApiKey)
+                resultsManager.retrieveMapResults(address.toString(), newsApiKey)
             }catch(exception: Exception){
                 Log.e("ResultsActivity", "Retrieving results failed!", exception)
                 listOf<Result>()
