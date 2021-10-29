@@ -1,26 +1,31 @@
 package com.example.androidnews
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Spinner
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import org.jetbrains.anko.doAsync
 
-private lateinit var recyclerView: RecyclerView
-private lateinit var spinner: Spinner
-
 class TopHeadlinesActivity: AppCompatActivity(), AdapterView.OnItemSelectedListener {
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var spinner: Spinner
+    private lateinit var prevButton: Button
+    private lateinit var nextButton: Button
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_sources)
+        setContentView(R.layout.activity_headlines)
 
-        recyclerView = findViewById(R.id.recyclerView)
+        prevButton = findViewById(R.id.prev_button)
+        nextButton = findViewById(R.id.nextButton)
+
+        val intent: Intent = getIntent()
+
+        recyclerView = findViewById(R.id.headline_recyclerView)
 
         //Sets the scrolling direction to vertical
         recyclerView.layoutManager = LinearLayoutManager(this)

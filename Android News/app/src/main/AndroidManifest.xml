@@ -49,6 +49,9 @@
         <activity
             android:name=".ResultsActivity"
             android:exported="true"></activity>
+        <activity android:name=".TopHeadlinesActivity"
+            android:exported="true"
+            android:label="Top Headlines"></activity>
     </application>
 
 </manifest>
