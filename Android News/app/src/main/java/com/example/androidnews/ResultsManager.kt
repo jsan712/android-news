@@ -55,7 +55,7 @@ class ResultsManager {
         val results: MutableList<Result> = mutableListOf()
 
         val request: Request = Request.Builder()
-            .url("https://newsapi.org/v2/everything?qInTitle='$location'&apiKey=$apiKey")
+            .url("https://newsapi.org/v2/everything?qInTitle=$location&apiKey=$apiKey")
             .get()
             .build()
 

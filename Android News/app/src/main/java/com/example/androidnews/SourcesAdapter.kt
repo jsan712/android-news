@@ -1,5 +1,7 @@
 package com.example.androidnews
 
+import android.app.SearchManager
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +17,10 @@ class SourcesAdapter(val sources: List<Source>) : RecyclerView.Adapter<SourcesAd
         val currSource = sources[position]
         viewHolder.name.setText(currSource.name)
         viewHolder.bio.setText(currSource.bio)
+        viewHolder.itemView.setOnClickListener {
+            val intent = Intent(Intent.ACTION_WEB_SEARCH)
+            intent.getStringExtra(SearchManager.QUERY)
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -27,6 +33,4 @@ class SourcesAdapter(val sources: List<Source>) : RecyclerView.Adapter<SourcesAd
         val name: TextView = rootLayout.findViewById(R.id.name)
         val bio: TextView = rootLayout.findViewById(R.id.bio)
     }
-
-
 }
