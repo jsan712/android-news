@@ -44,10 +44,12 @@ class SourcesManager {
                 val curr: JSONObject = statuses.getJSONObject(i)
                 val name: String = curr.getString("name")
                 val bio: String = curr.getString("description")
+                val id: String = curr.getString("id")
 
                 val source: Source = Source(
                     name = name,
-                    bio = bio
+                    bio = bio,
+                    id = id,
                 )
 
                 sources.add(source)

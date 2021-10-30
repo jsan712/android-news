@@ -55,7 +55,7 @@ class ResultsManager {
         val results: MutableList<Result> = mutableListOf()
 
         val request: Request = Request.Builder()
-            .url("https://newsapi.org/v2/everything?qInTitle=$location&apiKey=$apiKey")
+            .url("https://newsapi.org/v2/everything?qInTitle=$location&language=en&apiKey=$apiKey")
             .get()
             .build()
 
@@ -105,7 +105,6 @@ class ResultsManager {
         if(response.isSuccessful && !responseBody.isNullOrBlank()){
             val json: JSONObject = JSONObject(responseBody)
             val articles: JSONArray = json.getJSONArray("articles")
-            val maxPages: Int = json.getString("totalResults").toInt() / 20 + 1
 
             for(i in 0 until articles.length()){
                 val curr: JSONObject = articles.getJSONObject(i)

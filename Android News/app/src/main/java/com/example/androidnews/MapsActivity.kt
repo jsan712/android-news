@@ -71,13 +71,47 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val savedLon = preferences.getString("lon", "0.0")!!
         val savedPost = preferences.getString("post", "false")!!
         val savedLocation = preferences.getString("location", "false")!!
-        Log.d("MapsActivity", "Retrieved values: $savedLat and $savedLon and $savedPost and $savedLocation")
+        Log.d("MapsActivity", "Retrieved values")
+
+        //Show sources based on the location
+        recyclerView = findViewById(R.id.recyclerView)
+
+        /* Code to make recyclerView horizontal came from https://www.youtube.com/watch?v=EFZkktBOFF8
+         * which proved to be faulty and AndroidStudio suggested a fix that worked
+         */
+        recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
 
         if (savedLocation != "false") {
             val coords: LatLng = LatLng(savedLat.toDouble(), savedLon.toDouble())
 
-            mMap.addMarker(MarkerOptions().position(coords).title(savedPost))
+            mMap.addMarker(MarkerOptions().position(coords))
             mMap.moveCamera(CameraUpdateFactory.newLatLng(coords))
+
+            val resultsManager = ResultsManager()
+            val newsApiKey = getString(R.string.news_api_key)
+
+            doAsync {
+                val results: List<Result> = try{
+                    resultsManager.retrieveMapResults(savedLocation, newsApiKey)
+                }catch(exception: Exception){
+                    Log.e("MapsActivity", "Retrieving results failed!", exception)
+                    listOf<Result>()
+                }
+
+                runOnUiThread {
+                    if(results.isNotEmpty()){
+                        val adapter: ResultsAdapter = ResultsAdapter(results)
+                        recyclerView.adapter = adapter
+                    }
+                    else{
+                        Toast.makeText(
+                            this@MapsActivity,
+                            "Failed to retrieve results!",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            }
         }
 
         googleMap.setOnMapClickListener { coords: LatLng ->
@@ -111,6 +145,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
                         updateCurrentAddress(firstResult)
 
+                        //Save the location
+                        val editor = preferences.edit()
+                        editor.putString("lat", coords.latitude.toString())
+                        editor.putString("lon", coords.longitude.toString())
+                        editor.putString("post", postalAddress)
+                        editor.putString("location", firstResult.adminArea)
+                        editor.apply()
+                        Log.d("MapsActivity", "Coords saved")
+
                     } else {
                         Log.d("MapsActivity", "No results from geocoder!")
 
@@ -127,14 +170,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             //Show results for location text
             locationResults.visibility = View.VISIBLE
             locationResults.text = getString(R.string.results_for_location, currentAddress.toString())
-
-            //Show sources based on the location
-            recyclerView = findViewById(R.id.recyclerView)
-
-            /* Code to make recyclerView horizontal came from https://www.youtube.com/watch?v=EFZkktBOFF8
-             * which proved to be faulty and AndroidStudio suggested a fix that worked
-             */
-            recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
 
             val resultsManager = ResultsManager()
             val newsApiKey = getString(R.string.news_api_key)

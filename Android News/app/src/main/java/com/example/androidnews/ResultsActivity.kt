@@ -21,11 +21,12 @@ class ResultsActivity : AppCompatActivity() {
 
         //Get data from the Intent that launched this screen
         val intent: Intent = getIntent()
-        val result: String = intent.getStringExtra("RESULT")!!
-        //val address: Address = intent.getParcelableExtra("address")!!
+        val source: String = intent.getStringExtra("SOURCE")!!
+        val term: String = intent.getStringExtra("term")!!
+        val sourceID: String = intent.getStringExtra("SOURCEID")!!
 
         //Set the title for the screen when coming from the skip sources button
-        val title = getString(R.string.results_title, result)
+        val title = getString(R.string.results_title, term)
         setTitle(title)
 
         val resultsManager = ResultsManager()
@@ -33,8 +34,7 @@ class ResultsActivity : AppCompatActivity() {
 
         doAsync {
             val results: List<Result> = try{
-//                resultsManager.retrieveMapResults(address.toString(), newsApiKey)
-                resultsManager.retrieveHeadlineResults(result, newsApiKey)
+                resultsManager.retrieveHeadlineResults(term, newsApiKey)
             }catch(exception: Exception){
                 Log.e("ResultsActivity", "Retrieving results failed!", exception)
                 listOf<Result>()

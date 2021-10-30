@@ -33,7 +33,7 @@ class ResultsAdapter(val results: List<Result>) : RecyclerView.Adapter<ResultsAd
         }
 
         //When a card is clicked open the article in the browser
-        //The following snippet is adapted from
+        //The following snippet is adapted from Stackoverflow user Jorgesys in
         // https://stackoverflow.com/questions/2201917/how-can-i-open-a-url-in-androids-web-browser-from-my-application
         viewHolder.itemView.setOnClickListener {
             val context: Context = viewHolder.itemView.context

@@ -19,11 +19,13 @@ class SourcesAdapter(val sources: List<Source>) : RecyclerView.Adapter<SourcesAd
         viewHolder.name.setText(currSource.name)
         viewHolder.bio.setText(currSource.bio)
 
+        //The following snippet was adapted from https://oozou.com/blog/a-better-way-to-handle-click-action-in-a-recyclerview-item-60
         //When a card is clicked, open ResultsActivity for that source
         viewHolder.itemView.setOnClickListener {
             val context: Context = viewHolder.itemView.context
             val intent = Intent(context, ResultsActivity::class.java)
-            intent.putExtra("RESULT", currSource.name)
+            intent.putExtra("SOURCEID", currSource.id)
+            intent.putExtra("SOURCE", currSource.name)
             context.startActivity(intent)
         }
     }

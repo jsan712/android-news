@@ -10,13 +10,17 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 import org.jetbrains.anko.doAsync
 
 class TopHeadlinesActivity: AppCompatActivity(), AdapterView.OnItemSelectedListener {
     private lateinit var recyclerView: RecyclerView
     private lateinit var spinner: Spinner
-    private lateinit var prevButton: Button
-    private lateinit var nextButton: Button
+    private lateinit var prevButton: MaterialButton
+    private lateinit var nextButton: MaterialButton
+    private lateinit var pageNum: TextView
+    private var currPage = 1
+    private var maxPages = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,6 +31,7 @@ class TopHeadlinesActivity: AppCompatActivity(), AdapterView.OnItemSelectedListe
         prevButton = findViewById(R.id.prev_button)
         nextButton = findViewById(R.id.nextButton)
         recyclerView = findViewById(R.id.headline_recyclerView)
+        pageNum = findViewById(R.id.pageNum)
 
         //Sets the scrolling direction to vertical
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -41,6 +46,30 @@ class TopHeadlinesActivity: AppCompatActivity(), AdapterView.OnItemSelectedListe
         }
 
         spinner.onItemSelectedListener = this
+
+        val savedCategory = preferences.getString("category", "Business")!!
+        val savedSpinnerPos = preferences.getString("position", "0")!!
+        spinner.setSelection(savedSpinnerPos.toInt())
+
+        nextButton.setOnClickListener {
+            if(currPage == maxPages){
+                nextButton.setBackgroundColor(getColor(R.color.buttonGrey))
+            }
+            if(currPage < maxPages){
+                currPage++
+                showPage(spinner.getSelectedItem().toString(), currPage)
+            }
+        }
+
+        prevButton.setOnClickListener{
+            if(currPage == 1){
+                prevButton.setBackgroundColor(getColor(R.color.buttonGrey))
+            }
+            if(currPage > 1){
+                currPage--
+                showPage(spinner.getSelectedItem().toString(), currPage)
+            }
+        }
     }
 
     private fun getHeadlines(category: String){
@@ -81,5 +110,35 @@ class TopHeadlinesActivity: AppCompatActivity(), AdapterView.OnItemSelectedListe
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
         return
+    }
+
+    fun showPage(category: String, page: Int){
+        val resultsManager = ResultsManager()
+        val newsApiKey = getString(R.string.news_api_key)
+
+        doAsync {
+            val results: List<Result> = try{
+                resultsManager.retrieveHeadlineResults(category, newsApiKey)
+            }catch(exception: Exception){
+                Log.e("TopHeadlinesActivity", "Retrieving results failed!", exception)
+                listOf<Result>()
+            }
+
+            runOnUiThread {
+                if(results.isNotEmpty()){
+                    val adapter: ResultsAdapter = ResultsAdapter(results)
+                    recyclerView.adapter = adapter
+                    val updatePage = "$currPage / $maxPages"
+                    pageNum.text = updatePage
+                }
+                else{
+                    Toast.makeText(
+                        this@TopHeadlinesActivity,
+                        "Failed to retrieve results!",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
     }
 }
