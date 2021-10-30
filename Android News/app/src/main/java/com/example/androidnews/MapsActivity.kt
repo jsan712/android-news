@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.provider.Browser
 import android.util.Log
 import android.view.View
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.isVisible
@@ -32,6 +33,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityMapsBinding
     private lateinit var recyclerView: RecyclerView
     private lateinit var locationResults: TextView
+    private lateinit var progressBar: ProgressBar
     private var currentAddress: Address? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,6 +42,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
         locationResults = findViewById(R.id.locationResults)
+        progressBar = findViewById(R.id.progressBar2)
 
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -65,12 +68,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap = googleMap
 
         //Restore previous pin if one exists
-        val preferences = getSharedPreferences("android-news", Context.MODE_PRIVATE)
+        val savedPreferences = getSharedPreferences("android-news", Context.MODE_PRIVATE)
 
-        val savedLat = preferences.getString("lat", "0.0")!!
-        val savedLon = preferences.getString("lon", "0.0")!!
-        val savedPost = preferences.getString("post", "false")!!
-        val savedLocation = preferences.getString("location", "false")!!
+        val savedLat = savedPreferences.getString("lat", "0.0")!!
+        val savedLon = savedPreferences.getString("lon", "0.0")!!
+        val savedPost = savedPreferences.getString("post", "false")!!
+        val savedLocation = savedPreferences.getString("location", "false")!!
         Log.d("MapsActivity", "Retrieved values")
 
         //Show sources based on the location
@@ -147,7 +150,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         updateCurrentAddress(firstResult)
 
                         //Save the location
-                        val editor = preferences.edit()
+                        val editor = savedPreferences.edit()
                         editor.putString("lat", coords.latitude.toString())
                         editor.putString("lon", coords.longitude.toString())
                         editor.putString("post", postalAddress)

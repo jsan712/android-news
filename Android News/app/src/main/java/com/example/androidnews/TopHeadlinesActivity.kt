@@ -26,7 +26,7 @@ class TopHeadlinesActivity: AppCompatActivity(), AdapterView.OnItemSelectedListe
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_headlines)
 
-        val preferences: SharedPreferences = getSharedPreferences("android-news", Context.MODE_PRIVATE)
+        val savedPreferences = getSharedPreferences("android-news", Context.MODE_PRIVATE)
 
         prevButton = findViewById(R.id.prev_button)
         nextButton = findViewById(R.id.nextButton)
@@ -47,8 +47,8 @@ class TopHeadlinesActivity: AppCompatActivity(), AdapterView.OnItemSelectedListe
 
         spinner.onItemSelectedListener = this
 
-        val savedCategory = preferences.getString("category", "Business")!!
-        val savedSpinnerPos = preferences.getString("position", "0")!!
+        val savedCategory = savedPreferences.getString("category", "Business")!!
+        val savedSpinnerPos = savedPreferences.getString("position", "0")!!
         spinner.setSelection(savedSpinnerPos.toInt())
 
         nextButton.setOnClickListener {
@@ -102,8 +102,16 @@ class TopHeadlinesActivity: AppCompatActivity(), AdapterView.OnItemSelectedListe
 
     //The following functions provided by https://developer.android.com/guide/topics/ui/controls/spinner
     override fun onItemSelected(parent: AdapterView<*>, view: View?, pos: Int, id:Long){
+        val savedPreferences = getSharedPreferences("android-news", MODE_PRIVATE)
         val currPage = 1
         val category = parent.getItemAtPosition(pos).toString()
+
+        if(category != "Business"){
+            val editor = savedPreferences.edit()
+            editor.putString("category", category)
+            editor.putString("position", pos.toString())
+            editor.apply()
+        }
         getHeadlines(category)
         Log.i("TopHeadlinesActivity", "New spinner item selected!")
     }
