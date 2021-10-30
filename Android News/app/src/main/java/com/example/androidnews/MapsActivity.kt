@@ -81,11 +81,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
          */
         recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
 
+        //Display the results from the saved location
         if (savedLocation != "false") {
             val coords: LatLng = LatLng(savedLat.toDouble(), savedLon.toDouble())
 
-            mMap.addMarker(MarkerOptions().position(coords))
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(coords))
+            googleMap.addMarker(MarkerOptions().position(coords).title(savedPost))
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(coords, 10.0f))
 
             val resultsManager = ResultsManager()
             val newsApiKey = getString(R.string.news_api_key)
@@ -164,35 +165,34 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         )
                         toast.show()
                     }
-                }
-            }
+                    //Show results for location text
+                    locationResults.visibility = View.VISIBLE
+                    locationResults.text = getString(R.string.results_for_location, currentAddress!!.getAddressLine(0))
 
-            //Show results for location text
-            locationResults.visibility = View.VISIBLE
-            locationResults.text = getString(R.string.results_for_location, currentAddress.toString())
+                    val resultsManager = ResultsManager()
+                    val newsApiKey = getString(R.string.news_api_key)
 
-            val resultsManager = ResultsManager()
-            val newsApiKey = getString(R.string.news_api_key)
+                    doAsync {
+                        val results: List<Result> = try{
+                            resultsManager.retrieveMapResults(currentAddress!!.adminArea, newsApiKey)
+                        }catch(exception: Exception){
+                            Log.e("MapsActivity", "Retrieving results failed!", exception)
+                            listOf<Result>()
+                        }
 
-            doAsync {
-                val results: List<Result> = try{
-                    resultsManager.retrieveMapResults(currentAddress.toString(), newsApiKey)
-                }catch(exception: Exception){
-                    Log.e("MapsActivity", "Retrieving results failed!", exception)
-                    listOf<Result>()
-                }
-
-                runOnUiThread {
-                    if(results.isNotEmpty()){
-                        val adapter: ResultsAdapter = ResultsAdapter(results)
-                        recyclerView.adapter = adapter
-                    }
-                    else{
-                        Toast.makeText(
-                            this@MapsActivity,
-                            "Failed to retrieve results!",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        runOnUiThread {
+                            if(results.isNotEmpty()){
+                                val adapter: ResultsAdapter = ResultsAdapter(results)
+                                recyclerView.adapter = adapter
+                            }
+                            else{
+                                Toast.makeText(
+                                    this@MapsActivity,
+                                    "Failed to retrieve results!",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        }
                     }
                 }
             }
