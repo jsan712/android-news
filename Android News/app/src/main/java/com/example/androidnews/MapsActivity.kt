@@ -1,5 +1,6 @@
 package com.example.androidnews
 
+import android.content.Context
 import android.content.Intent
 import android.location.Address
 import android.location.Geocoder
@@ -63,6 +64,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
+        //Restore previous pin if one exists
+        val preferences = getSharedPreferences("android-news", Context.MODE_PRIVATE)
+
+        val savedLat = preferences.getString("lat", "0.0")!!
+        val savedLon = preferences.getString("lon", "0.0")!!
+        val savedPost = preferences.getString("post", "false")!!
+        val savedLocation = preferences.getString("location", "false")!!
+        Log.d("MapsActivity", "Retrieved values: $savedLat and $savedLon and $savedPost and $savedLocation")
+
+        if (savedLocation != "false") {
+            val coords: LatLng = LatLng(savedLat.toDouble(), savedLon.toDouble())
+
+            mMap.addMarker(MarkerOptions().position(coords).title(savedPost))
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(coords))
+        }
+
         googleMap.setOnMapClickListener { coords: LatLng ->
             googleMap.clear()
 
@@ -124,9 +141,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
             doAsync {
                 val results: List<Result> = try{
-                    resultsManager.retrieveMapResults("Washington D.C.", newsApiKey)
+                    resultsManager.retrieveMapResults(currentAddress.toString(), newsApiKey)
                 }catch(exception: Exception){
-                    Log.e("ResultsActivity", "Retrieving results failed!", exception)
+                    Log.e("MapsActivity", "Retrieving results failed!", exception)
                     listOf<Result>()
                 }
 
@@ -146,9 +163,4 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
     }
-
-    /*override fun onItemClick(position: Int) {
-        val openUrl: Intent = Intent(this, Browser)
-        startActivity(openUrl)
-    }*/
 }

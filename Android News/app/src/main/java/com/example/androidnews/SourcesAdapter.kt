@@ -1,6 +1,7 @@
 package com.example.androidnews
 
 import android.app.SearchManager
+import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
@@ -17,9 +18,13 @@ class SourcesAdapter(val sources: List<Source>) : RecyclerView.Adapter<SourcesAd
         val currSource = sources[position]
         viewHolder.name.setText(currSource.name)
         viewHolder.bio.setText(currSource.bio)
+
+        //When a card is clicked, open ResultsActivity for that source
         viewHolder.itemView.setOnClickListener {
-            val intent = Intent(Intent.ACTION_WEB_SEARCH)
-            intent.getStringExtra(SearchManager.QUERY)
+            val context: Context = viewHolder.itemView.context
+            val intent = Intent(context, ResultsActivity::class.java)
+            intent.putExtra("RESULT", currSource.name)
+            context.startActivity(intent)
         }
     }
 

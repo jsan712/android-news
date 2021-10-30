@@ -72,6 +72,7 @@ class ResultsManager {
                 val title: String = curr.getString("title")
                 val preview: String = curr.getString("description")
                 val pictureUrl: String = curr.getString("urlToImage")
+                val url: String = curr.getString("url")
 
                 val source: JSONObject = curr.getJSONObject("source")
                 val name: String = source.getString("name")
@@ -80,7 +81,8 @@ class ResultsManager {
                     headline = title,
                     preview = preview,
                     sourceName = name,
-                    pictureURL = pictureUrl
+                    pictureURL = pictureUrl,
+                    url = url
                 )
 
                 results.add(result)
@@ -103,6 +105,7 @@ class ResultsManager {
         if(response.isSuccessful && !responseBody.isNullOrBlank()){
             val json: JSONObject = JSONObject(responseBody)
             val articles: JSONArray = json.getJSONArray("articles")
+            val maxPages: Int = json.getString("totalResults").toInt() / 20 + 1
 
             for(i in 0 until articles.length()){
                 val curr: JSONObject = articles.getJSONObject(i)
@@ -110,6 +113,7 @@ class ResultsManager {
                 val title: String = curr.getString("title")
                 val preview: String = curr.getString("description")
                 val pictureUrl: String = curr.getString("urlToImage")
+                val url: String = curr.getString("url")
 
                 val source: JSONObject = curr.getJSONObject("source")
                 val name: String = source.getString("name")
@@ -118,7 +122,8 @@ class ResultsManager {
                     headline = title,
                     preview = preview,
                     sourceName = name,
-                    pictureURL = pictureUrl
+                    pictureURL = pictureUrl,
+                    url = url
                 )
 
                 results.add(result)

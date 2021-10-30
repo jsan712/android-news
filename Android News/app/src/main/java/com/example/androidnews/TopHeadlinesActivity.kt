@@ -1,6 +1,8 @@
 package com.example.androidnews
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -20,9 +22,10 @@ class TopHeadlinesActivity: AppCompatActivity(), AdapterView.OnItemSelectedListe
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_headlines)
 
+        val preferences: SharedPreferences = getSharedPreferences("android-news", Context.MODE_PRIVATE)
+
         prevButton = findViewById(R.id.prev_button)
         nextButton = findViewById(R.id.nextButton)
-
         recyclerView = findViewById(R.id.headline_recyclerView)
 
         //Sets the scrolling direction to vertical
@@ -48,7 +51,7 @@ class TopHeadlinesActivity: AppCompatActivity(), AdapterView.OnItemSelectedListe
             val results: List<Result> = try{
                 resultsManager.retrieveHeadlineResults(category, newsApiKey)
             }catch(exception: Exception){
-                Log.e("ResultsActivity", "Retrieving results failed!", exception)
+                Log.e("TopHeadlinesActivity", "Retrieving results failed!", exception)
                 listOf<Result>()
             }
 
@@ -70,6 +73,7 @@ class TopHeadlinesActivity: AppCompatActivity(), AdapterView.OnItemSelectedListe
 
     //The following functions provided by https://developer.android.com/guide/topics/ui/controls/spinner
     override fun onItemSelected(parent: AdapterView<*>, view: View?, pos: Int, id:Long){
+        val currPage = 1
         val category = parent.getItemAtPosition(pos).toString()
         getHeadlines(category)
         Log.i("TopHeadlinesActivity", "New spinner item selected!")
