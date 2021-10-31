@@ -20,7 +20,7 @@ class TopHeadlinesActivity: AppCompatActivity(), AdapterView.OnItemSelectedListe
     private lateinit var nextButton: MaterialButton
     private lateinit var pageNum: TextView
     private var currPage = 1
-    private var maxPages = 0
+    private var maxPages = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +51,8 @@ class TopHeadlinesActivity: AppCompatActivity(), AdapterView.OnItemSelectedListe
         val savedSpinnerPos = savedPreferences.getString("position", "0")!!
         spinner.setSelection(savedSpinnerPos.toInt())
 
+
+
         nextButton.setOnClickListener {
             if(currPage == maxPages){
                 nextButton.setBackgroundColor(getColor(R.color.buttonGrey))
@@ -70,15 +72,16 @@ class TopHeadlinesActivity: AppCompatActivity(), AdapterView.OnItemSelectedListe
                 showPage(spinner.getSelectedItem().toString(), currPage)
             }
         }
+        showPage(savedCategory, currPage)
     }
 
-    private fun getHeadlines(category: String){
+    private fun getHeadlines(category: String, page: Int){
         val resultsManager = ResultsManager()
         val newsApiKey = getString(R.string.news_api_key)
 
         doAsync {
             val results: List<Result> = try{
-                resultsManager.retrieveHeadlineResults(category, newsApiKey)
+                resultsManager.retrieveHeadlineResults(category, page, newsApiKey)
             }catch(exception: Exception){
                 Log.e("TopHeadlinesActivity", "Retrieving results failed!", exception)
                 listOf<Result>()
@@ -106,13 +109,22 @@ class TopHeadlinesActivity: AppCompatActivity(), AdapterView.OnItemSelectedListe
         val currPage = 1
         val category = parent.getItemAtPosition(pos).toString()
 
+        //Show page for new spinner item
+        showPage(category, currPage)
+
         if(category != "Business"){
             val editor = savedPreferences.edit()
             editor.putString("category", category)
             editor.putString("position", pos.toString())
             editor.apply()
         }
-        getHeadlines(category)
+        getHeadlines(category, currPage)
+
+        //Set the colors of the buttons upon new spinner items being selected
+        prevButton.setBackgroundColor(getColor(R.color.buttonGrey))
+        if(currPage == maxPages){
+            nextButton.setBackgroundColor(getColor(R.color.buttonGrey))
+        }
         Log.i("TopHeadlinesActivity", "New spinner item selected!")
     }
 
@@ -121,32 +133,8 @@ class TopHeadlinesActivity: AppCompatActivity(), AdapterView.OnItemSelectedListe
     }
 
     fun showPage(category: String, page: Int){
-        val resultsManager = ResultsManager()
-        val newsApiKey = getString(R.string.news_api_key)
-
-        doAsync {
-            val results: List<Result> = try{
-                resultsManager.retrieveHeadlineResults(category, newsApiKey)
-            }catch(exception: Exception){
-                Log.e("TopHeadlinesActivity", "Retrieving results failed!", exception)
-                listOf<Result>()
-            }
-
-            runOnUiThread {
-                if(results.isNotEmpty()){
-                    val adapter: ResultsAdapter = ResultsAdapter(results)
-                    recyclerView.adapter = adapter
-                    val updatePage = "$currPage / $maxPages"
-                    pageNum.text = updatePage
-                }
-                else{
-                    Toast.makeText(
-                        this@TopHeadlinesActivity,
-                        "Failed to retrieve results!",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-            }
-        }
+        getHeadlines(category, page)
+        val update = "$currPage / $maxPages"
+        pageNum.text = update
     }
 }

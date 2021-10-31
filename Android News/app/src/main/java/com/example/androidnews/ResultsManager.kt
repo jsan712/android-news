@@ -29,7 +29,7 @@ class ResultsManager {
         val results: MutableList<Result> = mutableListOf()
 
         val request: Request = Request.Builder()
-            .url("https://newsapi.org/v2/everything?q=$searchTerm&sources=$source&apiKey=$apiKey")
+            .url("https://newsapi.org/v2/everything?q=$searchTerm&sources=$source&language=en&apiKey=$apiKey")
             .get()
             .build()
 
@@ -39,6 +39,7 @@ class ResultsManager {
         if(response.isSuccessful && !responseBody.isNullOrBlank()){
             val json: JSONObject = JSONObject(responseBody)
             val articles: JSONArray = json.getJSONArray("articles")
+            val maxPages = json.getString("totalResults").toInt() / 20 + 1
 
             for(i in 0 until articles.length()){
                 val curr: JSONObject = articles.getJSONObject(i)
@@ -56,7 +57,8 @@ class ResultsManager {
                     preview = preview,
                     sourceName = name,
                     pictureURL = pictureUrl,
-                    url = url
+                    url = url,
+                    maxPages = maxPages
                 )
 
                 results.add(result)
@@ -79,6 +81,7 @@ class ResultsManager {
         if(response.isSuccessful && !responseBody.isNullOrBlank()){
             val json: JSONObject = JSONObject(responseBody)
             val articles: JSONArray = json.getJSONArray("articles")
+            val maxPages = json.getString("totalResults").toInt() / 20 + 1
 
             for(i in 0 until articles.length()){
                 val curr: JSONObject = articles.getJSONObject(i)
@@ -96,7 +99,8 @@ class ResultsManager {
                     preview = preview,
                     sourceName = name,
                     pictureURL = pictureUrl,
-                    url = url
+                    url = url,
+                    maxPages = maxPages
                 )
 
                 results.add(result)
@@ -105,11 +109,11 @@ class ResultsManager {
         return results
     }
 
-    fun retrieveHeadlineResults(category: String, apiKey: String): List<Result>{
+    fun retrieveHeadlineResults(category: String, page: Int, apiKey: String): List<Result>{
         val results: MutableList<Result> = mutableListOf()
 
         val request: Request = Request.Builder()
-            .url("https://newsapi.org/v2/top-headlines?category=$category&apiKey=$apiKey")
+            .url("https://newsapi.org/v2/top-headlines?country=us&category=$category&page=$page&apiKey=$apiKey")
             .get()
             .build()
 
@@ -119,6 +123,7 @@ class ResultsManager {
         if(response.isSuccessful && !responseBody.isNullOrBlank()){
             val json: JSONObject = JSONObject(responseBody)
             val articles: JSONArray = json.getJSONArray("articles")
+            val maxPages = json.getString("totalResults").toInt() / 20 + 1
 
             for(i in 0 until articles.length()){
                 val curr: JSONObject = articles.getJSONObject(i)
@@ -136,7 +141,8 @@ class ResultsManager {
                     preview = preview,
                     sourceName = name,
                     pictureURL = pictureUrl,
-                    url = url
+                    url = url,
+                    maxPages = maxPages
                 )
 
                 results.add(result)

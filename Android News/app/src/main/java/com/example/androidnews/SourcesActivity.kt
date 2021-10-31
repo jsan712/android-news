@@ -55,6 +55,7 @@ class SourcesActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener 
             Log.d("SourcesActivity", "skip button clicked!")
 
             val intent: Intent = Intent(this, ResultsActivity::class.java)
+            intent.putExtra("SOURCE_ID", "")
             intent.putExtra("RESULT_TERM", searchTerm)
             startActivity(intent)
         }

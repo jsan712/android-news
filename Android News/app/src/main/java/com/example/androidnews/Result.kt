@@ -5,5 +5,6 @@ data class Result(
     val preview: String,
     val sourceName: String,
     val pictureURL: String,
-    val url: String
+    val url: String,
+    val maxPages: Int
 )
