@@ -25,11 +25,11 @@ class ResultsManager {
         okHttpClient = okHttpClientBuilder.build()
     }
 
-    fun retrieveSourcesResults(searchTerm: String, apiKey: String): List<Result>{
+    fun retrieveSourcesResults(searchTerm: String, source: String, apiKey: String): List<Result>{
         val results: MutableList<Result> = mutableListOf()
 
         val request: Request = Request.Builder()
-            .url("https://newsapi.org/v2/everything?q=$searchTerm&apiKey=$apiKey")
+            .url("https://newsapi.org/v2/everything?q=$searchTerm&sources=$source&apiKey=$apiKey")
             .get()
             .build()
 

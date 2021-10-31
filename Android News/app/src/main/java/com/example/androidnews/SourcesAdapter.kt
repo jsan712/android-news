@@ -10,7 +10,7 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class SourcesAdapter(val sources: List<Source>) : RecyclerView.Adapter<SourcesAdapter.ViewHolder>() {
+class SourcesAdapter(val sources: List<Source>, val searchTerm: String) : RecyclerView.Adapter<SourcesAdapter.ViewHolder>() {
     //How many rows will be rendered
     override fun getItemCount(): Int = sources.size
 
@@ -24,8 +24,8 @@ class SourcesAdapter(val sources: List<Source>) : RecyclerView.Adapter<SourcesAd
         viewHolder.itemView.setOnClickListener {
             val context: Context = viewHolder.itemView.context
             val intent = Intent(context, ResultsActivity::class.java)
-            intent.putExtra("SOURCEID", currSource.id)
-            intent.putExtra("SOURCE", currSource.name)
+            intent.putExtra("SOURCE_ID", currSource.id)
+            intent.putExtra("RESULT_TERM", searchTerm)
             context.startActivity(intent)
         }
     }
