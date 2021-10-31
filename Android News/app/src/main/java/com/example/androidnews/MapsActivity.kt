@@ -1,19 +1,16 @@
 package com.example.androidnews
 
-import android.content.Intent
+import android.content.Context
 import android.location.Address
 import android.location.Geocoder
-import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.Browser
 import android.util.Log
 import android.view.View
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.OrientationHelper
 import androidx.recyclerview.widget.RecyclerView
 
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -31,6 +28,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityMapsBinding
     private lateinit var recyclerView: RecyclerView
     private lateinit var locationResults: TextView
+    private lateinit var progressBar: ProgressBar
     private var currentAddress: Address? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,6 +37,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
         locationResults = findViewById(R.id.locationResults)
+        progressBar = findViewById(R.id.progressBar2)
 
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -62,6 +61,57 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+
+        //Restore previous pin if one exists
+        val savedPreferences = getSharedPreferences("android-news", Context.MODE_PRIVATE)
+
+        val savedLat = savedPreferences.getString("lat", "0.0")!!
+        val savedLon = savedPreferences.getString("lon", "0.0")!!
+        val savedPost = savedPreferences.getString("post", "false")!!
+        val savedLocation = savedPreferences.getString("location", "false")!!
+        Log.d("MapsActivity", "Retrieved values")
+
+        //Show sources based on the location
+        recyclerView = findViewById(R.id.recyclerView)
+
+        /* Code to make recyclerView horizontal came from https://www.youtube.com/watch?v=EFZkktBOFF8
+         * which proved to be faulty and AndroidStudio suggested a fix that worked
+         */
+        recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
+
+        //Display the results from the saved location
+        if (savedLocation != "false") {
+            val coords: LatLng = LatLng(savedLat.toDouble(), savedLon.toDouble())
+
+            googleMap.addMarker(MarkerOptions().position(coords).title(savedPost))
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(coords, 10.0f))
+
+            val resultsManager = ResultsManager()
+            val newsApiKey = getString(R.string.news_api_key)
+
+            doAsync {
+                val results: List<Result> = try{
+                    resultsManager.retrieveMapResults(savedLocation, newsApiKey)
+                }catch(exception: Exception){
+                    Log.e("MapsActivity", "Retrieving results failed!", exception)
+                    listOf<Result>()
+                }
+
+                runOnUiThread {
+                    if(results.isNotEmpty()){
+                        val adapter: ResultsAdapter = ResultsAdapter(results)
+                        recyclerView.adapter = adapter
+                    }
+                    else{
+                        Toast.makeText(
+                            this@MapsActivity,
+                            "Failed to retrieve results!",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            }
+        }
 
         googleMap.setOnMapClickListener { coords: LatLng ->
             googleMap.clear()
@@ -94,6 +144,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
                         updateCurrentAddress(firstResult)
 
+                        //Save the location
+                        val editor = savedPreferences.edit()
+                        editor.putString("lat", coords.latitude.toString())
+                        editor.putString("lon", coords.longitude.toString())
+                        editor.putString("post", postalAddress)
+                        editor.putString("location", firstResult.adminArea)
+                        editor.apply()
+                        Log.d("MapsActivity", "Coords saved")
+
                     } else {
                         Log.d("MapsActivity", "No results from geocoder!")
 
@@ -104,51 +163,37 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         )
                         toast.show()
                     }
-                }
-            }
+                    //Show results for location text
+                    locationResults.visibility = View.VISIBLE
+                    locationResults.text = getString(R.string.results_for_location, currentAddress!!.getAddressLine(0))
 
-            //Show results for location text
-            locationResults.visibility = View.VISIBLE
-            locationResults.text = getString(R.string.results_for_location, currentAddress.toString())
+                    val resultsManager = ResultsManager()
+                    val newsApiKey = getString(R.string.news_api_key)
 
-            //Show sources based on the location
-            recyclerView = findViewById(R.id.recyclerView)
+                    doAsync {
+                        val results: List<Result> = try{
+                            resultsManager.retrieveMapResults(currentAddress!!.adminArea, newsApiKey)
+                        }catch(exception: Exception){
+                            Log.e("MapsActivity", "Retrieving results failed!", exception)
+                            listOf<Result>()
+                        }
 
-            /* Code to make recyclerView horizontal came from https://www.youtube.com/watch?v=EFZkktBOFF8
-             * which proved to be faulty and AndroidStudio suggested a fix that worked
-             */
-            recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
-
-            val resultsManager = ResultsManager()
-            val newsApiKey = getString(R.string.news_api_key)
-
-            doAsync {
-                val results: List<Result> = try{
-                    resultsManager.retrieveResults("Washington D.C.", newsApiKey)
-                }catch(exception: Exception){
-                    Log.e("ResultsActivity", "Retrieving results failed!", exception)
-                    listOf<Result>()
-                }
-
-                runOnUiThread {
-                    if(results.isNotEmpty()){
-                        val adapter: ResultsAdapter = ResultsAdapter(results)
-                        recyclerView.adapter = adapter
-                    }
-                    else{
-                        Toast.makeText(
-                            this@MapsActivity,
-                            "Failed to retrieve results!",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        runOnUiThread {
+                            if(results.isNotEmpty()){
+                                val adapter: ResultsAdapter = ResultsAdapter(results)
+                                recyclerView.adapter = adapter
+                            }
+                            else{
+                                Toast.makeText(
+                                    this@MapsActivity,
+                                    "Failed to retrieve results!",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        }
                     }
                 }
             }
         }
     }
-
-    /*override fun onItemClick(position: Int) {
-        val openUrl: Intent = Intent(this, Browser)
-        startActivity(openUrl)
-    }*/
 }

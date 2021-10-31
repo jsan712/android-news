@@ -19,6 +19,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mapButton: Button
     private lateinit var headlinesButton: Button
     private lateinit var progressBar: ProgressBar
+    private lateinit var topHeadlines: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +34,7 @@ class MainActivity : AppCompatActivity() {
         mapButton= findViewById(R.id.mapButton)
         headlinesButton= findViewById(R.id.headlinesButton)
         progressBar = findViewById(R.id.progressBar)
+        topHeadlines = findViewById(R.id.headlinesButton)
 
         //Restore the previous search from SharedPreferences and display it to the user when the screen loads
         //Default to the empty string if there is no saved search term
@@ -65,6 +67,13 @@ class MainActivity : AppCompatActivity() {
             Log.d("MainActivity", "Map button clicked!")
 
             val intent: Intent = Intent(this, MapsActivity::class.java)
+            startActivity(intent)
+        }
+
+        topHeadlines.setOnClickListener {
+            Log.d("MainActivity", "Top Headlines button clicked!")
+
+            val intent: Intent = Intent(this, TopHeadlinesActivity::class.java)
             startActivity(intent)
         }
     }

@@ -15,15 +15,16 @@ class SourcesActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener 
     private lateinit var recyclerView: RecyclerView
     private lateinit var spinner: Spinner
     private lateinit var skipButton: Button
+    private lateinit var searchTerm: String
 
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sources)
-        skipButton= findViewById(R.id.skipButton)
+        skipButton = findViewById(R.id.skipButton)
 
         //Get data from the Intent that launched this screen
         val intent: Intent = getIntent()
-        val searchTerm: String = intent.getStringExtra("SEARCH")!!
+        searchTerm = intent.getStringExtra("SEARCH")!!
 
         //Set the title for the screen
         val title = getString(R.string.sources_title, searchTerm)
@@ -48,15 +49,25 @@ class SourcesActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener 
 
         spinner.onItemSelectedListener = this
 
+
+        //If the skipButton is clicked then move to the results page without filtering results
+        skipButton.setOnClickListener {
+            Log.d("SourcesActivity", "skip button clicked!")
+
+            val intent: Intent = Intent(this, ResultsActivity::class.java)
+            intent.putExtra("SOURCE_ID", "")
+            intent.putExtra("RESULT_TERM", searchTerm)
+            startActivity(intent)
+        }
+    }
+
+    private fun getSources(category: String){
         val sourcesManager = SourcesManager()
         val newsApiKey = getString(R.string.news_api_key)
 
-        //println("Category = $category")
-        //val category = "Washington D.C."
-
         doAsync {
             val sources: List<Source> = try{
-                sourcesManager.retrieveSources(searchTerm, newsApiKey)
+                sourcesManager.retrieveSources(category, newsApiKey)
             }catch(exception: Exception){
                 Log.e("SourcesActivity", "Retrieving Sources failed!", exception)
                 listOf<Source>()
@@ -64,7 +75,7 @@ class SourcesActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener 
 
             runOnUiThread {
                 if(sources.isNotEmpty()){
-                    val adapter: SourcesAdapter = SourcesAdapter(sources)
+                    val adapter: SourcesAdapter = SourcesAdapter(sources, searchTerm)
                     recyclerView.adapter = adapter
                 }
                 else{
@@ -76,21 +87,12 @@ class SourcesActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener 
                 }
             }
         }
-
-        //If the skipButton is clicked then move to the results page without filtering results
-        skipButton.setOnClickListener {
-            Log.d("SourcesActivity", "skip button clicked!")
-
-            val intent: Intent = Intent(this, ResultsActivity::class.java)
-            intent.putExtra("RESULT", searchTerm)
-            startActivity(intent)
-        }
     }
 
     //The following functions provided by https://developer.android.com/guide/topics/ui/controls/spinner
     override fun onItemSelected(parent: AdapterView<*>, view: View?, pos: Int, id:Long){
-        val selection: String = parent.getItemAtPosition(pos).toString()
-        //category = selection
+        val category = parent.getItemAtPosition(pos).toString()
+        getSources(category)
         Log.i("SourcesActivity", "New spinner item selected!")
     }
 

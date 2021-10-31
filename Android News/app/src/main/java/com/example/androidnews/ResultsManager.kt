@@ -25,37 +25,11 @@ class ResultsManager {
         okHttpClient = okHttpClientBuilder.build()
     }
 
-    /*fun retrieveUrl(apiKey: String): String{
-        val urls: MutableList<String> = mutableListOf()
-        //val searchLocation: String =
-
-
-        val request: Request = Request.Builder()
-            .url("https://newsapi.org/v2/everything?qInTitle=+'Washington+D.C.'&apiKey=$apiKey")
-            .get()
-            .build()
-
-        val response: Response = okHttpClient.newCall(request).execute()
-        val responseBody: String? = response.body?.string()
-
-        if(response.isSuccessful && !responseBody.isNullOrBlank()) {
-            val json: JSONObject = JSONObject(responseBody)
-            val articles: JSONArray = json.getJSONArray("articles")
-
-            for (i in 0 until articles.length()) {
-                val curr: JSONObject = articles.getJSONObject(i)
-                val url: String = curr.getString("url")
-                urls.add(url)
-            }
-        }
-        return urls[0]
-    }*/
-
-    fun retrieveResults(location: String, apiKey: String): List<Result>{
+    fun retrieveSourcesResults(searchTerm: String, source: String, apiKey: String): List<Result>{
         val results: MutableList<Result> = mutableListOf()
 
         val request: Request = Request.Builder()
-            .url("https://newsapi.org/v2/everything?qInTitle='$location'&apiKey=$apiKey")
+            .url("https://newsapi.org/v2/everything?q=$searchTerm&sources=$source&language=en&apiKey=$apiKey")
             .get()
             .build()
 
@@ -65,6 +39,7 @@ class ResultsManager {
         if(response.isSuccessful && !responseBody.isNullOrBlank()){
             val json: JSONObject = JSONObject(responseBody)
             val articles: JSONArray = json.getJSONArray("articles")
+            val maxPages = json.getString("totalResults").toInt() / 20 + 1
 
             for(i in 0 until articles.length()){
                 val curr: JSONObject = articles.getJSONObject(i)
@@ -72,6 +47,7 @@ class ResultsManager {
                 val title: String = curr.getString("title")
                 val preview: String = curr.getString("description")
                 val pictureUrl: String = curr.getString("urlToImage")
+                val url: String = curr.getString("url")
 
                 val source: JSONObject = curr.getJSONObject("source")
                 val name: String = source.getString("name")
@@ -80,7 +56,93 @@ class ResultsManager {
                     headline = title,
                     preview = preview,
                     sourceName = name,
-                    pictureURL = pictureUrl
+                    pictureURL = pictureUrl,
+                    url = url,
+                    maxPages = maxPages
+                )
+
+                results.add(result)
+            }
+        }
+        return results
+    }
+
+    fun retrieveMapResults(location: String, apiKey: String): List<Result>{
+        val results: MutableList<Result> = mutableListOf()
+
+        val request: Request = Request.Builder()
+            .url("https://newsapi.org/v2/everything?qInTitle=$location&language=en&apiKey=$apiKey")
+            .get()
+            .build()
+
+        val response: Response = okHttpClient.newCall(request).execute()
+        val responseBody: String? = response.body?.string()
+
+        if(response.isSuccessful && !responseBody.isNullOrBlank()){
+            val json: JSONObject = JSONObject(responseBody)
+            val articles: JSONArray = json.getJSONArray("articles")
+            val maxPages = json.getString("totalResults").toInt() / 20 + 1
+
+            for(i in 0 until articles.length()){
+                val curr: JSONObject = articles.getJSONObject(i)
+
+                val title: String = curr.getString("title")
+                val preview: String = curr.getString("description")
+                val pictureUrl: String = curr.getString("urlToImage")
+                val url: String = curr.getString("url")
+
+                val source: JSONObject = curr.getJSONObject("source")
+                val name: String = source.getString("name")
+
+                val result: Result = Result(
+                    headline = title,
+                    preview = preview,
+                    sourceName = name,
+                    pictureURL = pictureUrl,
+                    url = url,
+                    maxPages = maxPages
+                )
+
+                results.add(result)
+            }
+        }
+        return results
+    }
+
+    fun retrieveHeadlineResults(category: String, page: Int, apiKey: String): List<Result>{
+        val results: MutableList<Result> = mutableListOf()
+
+        val request: Request = Request.Builder()
+            .url("https://newsapi.org/v2/top-headlines?country=us&category=$category&page=$page&apiKey=$apiKey")
+            .get()
+            .build()
+
+        val response: Response = okHttpClient.newCall(request).execute()
+        val responseBody: String? = response.body?.string()
+
+        if(response.isSuccessful && !responseBody.isNullOrBlank()){
+            val json: JSONObject = JSONObject(responseBody)
+            val articles: JSONArray = json.getJSONArray("articles")
+            val maxPages = json.getString("totalResults").toInt() / 20 + 1
+
+            for(i in 0 until articles.length()){
+                val curr: JSONObject = articles.getJSONObject(i)
+
+                val title: String = curr.getString("title")
+                val preview: String = curr.getString("description")
+                val pictureUrl: String = curr.getString("urlToImage")
+                val url: String = curr.getString("url")
+
+                val source: JSONObject = curr.getJSONObject("source")
+                val name: String = source.getString("name")
+
+                val result: Result = Result(
+                    headline = title,
+                    preview = preview,
+                    sourceName = name,
+                    pictureURL = pictureUrl,
+                    url = url,
+                    maxPages = maxPages
                 )
 
                 results.add(result)
